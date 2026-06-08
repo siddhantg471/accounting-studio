@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accounting Studio | Dashboard</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    
+    <script src="js/theme.js"></script>
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/landing.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+    <!-- Global Ambient Background Glows -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <div id="view-login" class="app-view">
+        <!-- Ambient Background Glows -->
+    
+    
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 20px;">
+                    <button class="theme-toggle" onclick="window.toggleTheme()" title="Toggle Dark/Light Mode" style="margin-right: 0;">
+                        <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                </div>
+                <h1 id="auth-title">Welcome Back</h1>
+                <p id="auth-subtitle">Sign in to continue to Accounting Studio</p>
+            </div>
+
+            <div id="error-message" class="alert hidden"></div>
+            <div id="success-message" class="alert alert-success hidden"></div>
+
+            <form id="auth-form" class="auth-form">
+                <div class="input-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                        <input type="email" id="email" placeholder="you@example.com" required>
+                    </div>
+                </div>
+
+                <div class="input-group" id="password-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <div class="forgot-link-container" id="forgot-container">
+                    <a href="#" id="forgot-link">Forgot Password?</a>
+                </div>
+
+                <button type="submit" id="submit-btn" class="btn btn-primary w-full">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="divider" id="google-divider">
+                <span>OR</span>
+            </div>
+
+            <button type="button" id="google-btn" class="btn btn-secondary w-full">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" stroke="none"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" stroke="none"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" stroke="none"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" stroke="none"/></svg>
+                Continue with Google
+            </button>
+
+            <div class="auth-footer" id="mode-footer">
+                <p>Don't have an account? <a href="#" id="toggle-mode-link">Sign Up</a></p>
+            </div>
+        </div>
+    </div>
+    </div>
+    
+    <div id="view-dashboard" class="app-view">
+        <!-- Ambient Background Glows -->
+    
+    
+
+    <nav class="navbar">
+        <div class="logo">
+            <span class="logo-icon">⌘</span>
+            Accounting Studio
+        </div>
+        <div class="nav-links" style="align-items: center; display: flex;">
+            
+<button class="theme-toggle" onclick="window.toggleTheme()" title="Toggle Dark/Light Mode">
+    <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+    <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+</button>
+        <div class="user-profile-menu">
+            <div class="nav-profile-trigger" onclick="document.getElementById('profile-dropdown').classList.toggle('show')">
+                <div class="profile-avatar-small" id="nav-avatar-initial">S</div>
+                <span class="user-email-display">Loading...</span>
+            </div>
+            <div class="profile-dropdown" id="profile-dropdown">
+                <div class="profile-header">
+                    <div class="profile-avatar" id="profile-avatar-initial">S</div>
+                    <div class="profile-info">
+                        <div class="profile-name user-email-display" style="padding:0; pointer-events:none;">Loading...</div>
+                        <div class="profile-email" id="profile-email-full">email@example.com</div>
+                    </div>
+                </div>
+                <div class="profile-body">
+                    <div class="profile-stats">
+                        <div class="profile-stat">
+                            <span class="stat-label">Account Status</span>
+                            <span class="stat-val text-success">Active</span>
+                        </div>
+                        <div class="profile-stat">
+                            <span class="stat-label">Member Since</span>
+                            <span class="stat-val" id="profile-created">...</span>
+                        </div>
+                    </div>
+                    <hr style="border: 0; border-top: 1px solid var(--border); margin: 0 0 16px 0;">
+                    <button class="logout-btn btn btn-outline" style="width: 100%;">Log Out</button>
+                </div>
+            </div>
+        </div>
+        </div>
+    </nav>
+
+    <main class="hero">
+        <div class="hero-content">
+            <div class="badge">Welcome to your Workspace</div>
+            <h1 class="title" id="dashboard-title">Your <span>Dashboard.</span></h1>
+            <p class="subtitle">Manage your billing process, create new invoices, and track your business all in one place.</p>
+            <div class="cta-group" style="flex-wrap: wrap;">
+                <a href="#invoice" class="btn btn-primary btn-lg">
+                    Create New Bill
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </a>
+                <a href="#ledgers" class="btn btn-secondary btn-lg" style="gap: 8px;">
+                    Ledgers (Accounts)
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                </a>
+                <a href="#inventory" class="btn btn-secondary btn-lg" style="gap: 8px;">
+                    Inventory
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                </a>
+                <a href="#analyzer" class="btn btn-outline btn-lg" style="gap: 8px;">
+                    Analyze Statement
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="8" y1="13" x2="16" y2="13"></line>
+                        <line x1="8" y1="17" x2="16" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                </a>
+                <a href="#daybook" class="btn btn-secondary btn-lg" style="gap: 8px;">
+                    Daybook (Journal)
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                </a>
+            </div>
+
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Total Invoices</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">₹0</div>
+                    <div class="stat-label">Total Revenue</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="hero-visual">
+            <div class="glass-card mockup-card">
+                <div class="mockup-header">
+                    <div class="mockup-dots"><span></span><span></span><span></span></div>
+                    <div class="mockup-title">Recent Activity</div>
+                </div>
+                <div class="mockup-body" style="text-align: center; color: var(--text-muted); padding: 2rem 0;">
+                    <p>No recent invoices found.</p>
+                    <p style="font-size: 0.8rem; margin-top: 0.5rem;">Create your first bill to see activity here.</p>
+                </div>
+            </div>
+            <!-- Decorative floating elements -->
+            <div class="floating-badge badge-1">Secure <br> Cloud Sync</div>
+            <div class="floating-badge badge-2">GST <br> Ready</div>
+        </div>
+    </main>
+    
+    <!-- Global Footer -->
+    <footer class="global-footer">
+        &copy; 2026 Siddhant Inovations. All rights reserved.
+    </footer>
+    </div>
+    
+    <div id="view-invoice" class="app-view">
+        <div class="app-container">
+        <!-- Editor Panel -->
+        <aside class="editor-panel">
+            <header class="editor-header" style="flex-wrap: wrap;">
+                <h1>Accounting Studio</h1>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <span style="font-size: 0.7rem; font-weight: 500; color: var(--text-muted);">READY TO SEND</span>
+                    
+<button class="theme-toggle" onclick="window.toggleTheme()" title="Toggle Dark/Light Mode">
+    <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+    <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+</button>
+<a href="#dashboard" class="btn btn-outline" style="padding: 4px 8px; font-size: 0.7rem; text-decoration: none;">Dashboard</a>
+                    <button id="sign-out-btn" class="btn btn-outline" style="padding: 4px 8px; font-size: 0.7rem;">Sign Out</button>
+                </div>
+            </header>
+            <!-- Seller Info -->
+            <section class="section-card">
+                <h2 class="section-title">Seller Information</h2>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>Company Name</label>
+                        <input type="text" data-sync="seller-name" placeholder="Your Company Name">
+                    </div>
+                    <div class="input-group">
+                        <label>Business Nature (Subtitle)</label>
+                        <input type="text" data-sync="seller-subtitle" placeholder="MFRS OF : ...">
+                    </div>
+                    <div class="input-group">
+                        <label>Address</label>
+                        <input type="text" data-sync="seller-address" placeholder="Company Address">
+                    </div>
+                    <div class="input-group">
+                        <label>Email Address</label>
+                        <input type="text" data-sync="seller-email" placeholder="email@example.com">
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <div class="input-group" style="flex: 1;">
+                            <label>Mob. Numbers</label>
+                            <input type="text" data-sync="seller-mob" placeholder="98XXXXXXXX, 98XXXXXXXX">
+                        </div>
+                        <div class="input-group" style="flex: 1;">
+                            <label>Tele Fax</label>
+                            <input type="text" data-sync="seller-fax" placeholder="011-XXXXXXXX">
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <div class="input-group" style="flex: 1;">
+                            <label>GSTIN NO</label>
+                            <input type="text" data-sync="seller-gstin" placeholder="07XXXXXXXXXXXXX">
+                        </div>
+                        <div class="input-group" style="flex: 1;">
+                            <label>PAN NO</label>
+                            <input type="text" data-sync="seller-pan" placeholder="XXXXXXXXXX">
+                        </div>
+                        <div class="input-group" style="width: 80px;">
+                            <label>State Code</label>
+                            <input type="text" data-sync="seller-statecode" placeholder="07">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Receiver Info -->
+            <section class="section-card">
+                <h2 class="section-title">Receiver Details</h2>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>Company/Name</label>
+                        <input type="text" data-sync="receiver-name" placeholder="ABC Corp Pvt Ltd">
+                    </div>
+                    <div class="input-group">
+                        <label>Address</label>
+                        <input type="text" data-sync="receiver-address" placeholder="123 Street, Area, City">
+                    </div>
+                    <div class="input-group">
+                        <label>GSTIN</label>
+                        <input type="text" data-sync="receiver-gstin" placeholder="07XXXXXXXXXXXXX">
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <div class="input-group" style="flex: 1;">
+                            <label>State</label>
+                            <input type="text" data-sync="receiver-state" value="Delhi">
+                        </div>
+                        <div class="input-group" style="width: 80px;">
+                            <label>Code</label>
+                            <input type="text" data-sync="receiver-statecode" value="07">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Invoice Metadata -->
+            <section class="section-card">
+                <h2 class="section-title">Invoice Information</h2>
+                <div class="input-grid">
+                    <div style="display: flex; gap: 12px;">
+                        <div class="input-group" style="flex: 1;">
+                            <label>Invoice Number</label>
+                            <input type="text" data-sync="invoice-no" value="351">
+                        </div>
+                        <div class="input-group" style="flex: 1;">
+                            <label>Invoice Date</label>
+                            <input type="date" id="date-input" data-sync="invoice-date">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Place of Supply</label>
+                        <input type="text" data-sync="invoice-supply" placeholder="State/City">
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <div class="input-group" style="flex: 1;">
+                            <label>Vehicle Number</label>
+                            <input type="text" data-sync="invoice-vehicle" placeholder="DL 01 XXXX">
+                        </div>
+                        <div class="input-group" style="flex: 1;">
+                            <label>Transport Mode</label>
+                            <input type="text" data-sync="invoice-mode" value="Road">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Items -->
+            <section class="section-card" style="z-index: 10; position: relative;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h2 class="section-title" style="margin-bottom: 0;">Line Items</h2>
+                    <button class="btn btn-outline" style="padding: 6px 12px; font-size: 0.75rem;"
+                        onclick="addItemRow()">
+                        + Add New
+                    </button>
+                </div>
+                <div class="item-header-row" style="margin-bottom: 4px; padding: 0 4px; font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">
+                    <div>Description</div>
+                    <div>HSN</div>
+                    <div>Qty</div>
+                    <div>UOM</div>
+                    <div>Rate</div>
+                    <div>Total</div>
+                    <div></div>
+                </div>
+                <div id="editor-items-list" class="items-list">
+                    <!-- Rows injected here -->
+                </div>
+            </section>
+
+            <!-- Taxes & Discounts -->
+            <section class="section-card">
+                <h2 class="section-title">Totals & Adjustments</h2>
+                <div class="input-grid">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="input-group">
+                            <label>Discount (₹)</label>
+                            <input type="number" id="discount-val" value="0" step="0.01">
+                        </div>
+                        <div class="input-group">
+                            <label>Cartage (₹)</label>
+                            <input type="number" id="cartage-val" value="0" step="0.01">
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <div class="input-group" style="flex: 1;">
+                            <label>SGST (%)</label>
+                            <input type="number" id="sgst-rate-val" value="9" step="0.1">
+                        </div>
+                        <div class="input-group" style="flex: 1;">
+                            <label>CGST (%)</label>
+                            <input type="number" id="cgst-rate-val" value="9" step="0.1">
+                        </div>
+                        <div class="input-group" style="flex: 1;">
+                            <label>IGST (%)</label>
+                            <input type="number" id="igst-rate-val" value="0" step="0.1">
+                        </div>
+                    </div>
+                    <div class="input-group" style="margin-top: 12px;">
+                        <label>Reverse Charges @GST</label>
+                        <input type="text" data-sync="reverse-charge" placeholder="N/A or Yes/No">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Terms & Conditions -->
+            <section class="section-card">
+                <h2 class="section-title">Terms & Conditions</h2>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <textarea data-sync="terms" rows="4">Goods once sold will not be taken back.
+All Disputes are subject to Delhi Jurisdiction only.
+Interest @ 24% p/a will be charged if payment not made within 30 days.</textarea>
+                    </div>
+                </div>
+            </section>
+
+            <div style="height: 40px;"></div> <!-- Spacer -->
+        </aside>
+
+        <!-- Preview Panel -->
+        <main class="preview-panel">
+            <nav class="preview-actions">
+                <button class="btn btn-primary" onclick="window.saveAndPrintInvoice()">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    Print Invoice
+                </button>
+                <button class="btn btn-outline" style="border-radius: 100px;" onclick="resetForm()">
+                    Clear All Data
+                </button>
+            </nav>
+
+            <article id="invoice-doc" class="invoice-paper">
+                <header class="invoice-header">
+                    <div class="header-top">
+                        <div class="company-branding">
+                            <h2 class="company-name" id="view-seller-name"></h2>
+                            <div class="company-subtitle" id="view-seller-subtitle"></div>
+                        </div>
+                        <div class="tax-label">TAX INVOICE</div>
+                    </div>
+                    <div class="header-details">
+                        <div class="company-contact">
+                            <div class="company-address" id="view-seller-address"></div>
+                            <div class="company-contact-line">Email: <span id="view-seller-email"></span> | Mob: <span id="view-seller-mob"></span> | Tele Fax: <span id="view-seller-fax"></span></div>
+                        </div>
+                        <div class="company-tax-info">
+                            <div><strong>GSTIN:</strong> <span id="view-seller-gstin"></span></div>
+                            <div><strong>PAN:</strong> <span id="view-seller-pan"></span></div>
+                            <div><strong>STATE CODE:</strong> <span id="view-seller-statecode"></span></div>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="invoice-info-grid">
+                    <section class="receiver-side">
+                        <div
+                            style="font-weight: bold; border-bottom: 1px solid #000; margin-bottom: 5px; font-size: 12px;">
+                            Detail of Receiver</div>
+                        <div class="info-row"><span>Name:</span> <span id="view-receiver-name"></span></div>
+                        <div class="info-row"><span>Address:</span> <span id="view-receiver-address"></span></div>
+                        <div class="info-row"><span>GSTIN:</span> <span id="view-receiver-gstin"></span></div>
+                        <div class="info-row"><span>State/Code:</span> <span><span id="view-receiver-state"></span> /
+                                <span id="view-receiver-statecode"></span></span></div>
+                    </section>
+                    <section class="metadata-side">
+                        <div class="info-row"><span>Invoice No.:</span> <span id="view-invoice-no"
+                                style="font-weight: bold; font-size: 14px;"></span></div>
+                        <div class="info-row"><span>Dated:</span> <span id="view-invoice-date"></span></div>
+                        <div class="info-row"><span>Transport:</span> <span id="view-invoice-mode"></span></div>
+                        <div class="info-row"><span>Vehicle No.:</span> <span id="view-invoice-vehicle"></span></div>
+                        <div class="info-row"><span>Place of Supply:</span> <span id="view-invoice-supply"></span></div>
+                    </section>
+                </div>
+
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th width="40">Sr.</th>
+                            <th class="text-left">Descriptions</th>
+                            <th width="80">HSN</th>
+                            <th width="60">Qty</th>
+                            <th width="60">UOM</th>
+                            <th width="80">Rate</th>
+                            <th width="100">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="preview-items-body">
+                        <!-- Lines injected -->
+                    </tbody>
+                </table>
+
+                <footer class="calc-grid">
+                    <div class="words-col">
+                        <div style="font-size: 12px;">
+                            <strong>Reverse Charges @GST:</strong> <span id="view-reverse-charge"></span>
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <strong>Amount in Words:</strong><br>
+                            <span id="view-amount-words" style="font-style: italic; font-size: 13px;"></span>
+                        </div>
+                    </div>
+                    <div class="totals-col">
+                        <div class="total-line"><span>Sale Value:</span> <span id="view-sale-value">0.00</span></div>
+                        <div class="total-line"><span>Discount:</span> <span id="view-discount-amt">0.00</span></div>
+                        <div class="total-line"><span>Cartage:</span> <span id="view-cartage-amt">0.00</span></div>
+                        <div class="total-line"><span>Taxable Amnt:</span> <span id="view-taxable-amt">0.00</span></div>
+                        <div class="total-line"><span>SGST (<small><span id="view-sgst-rate"></span>%</small>):</span>
+                            <span id="view-sgst-amt">0.00</span></div>
+                        <div class="total-line"><span>CGST (<small><span id="view-cgst-rate"></span>%</small>):</span>
+                            <span id="view-cgst-amt">0.00</span></div>
+                        <div class="total-line"><span>IGST (<small><span id="view-igst-rate"></span>%</small>):</span>
+                            <span id="view-igst-amt">0.00</span></div>
+                        <div class="total-line"><span style="font-size: 15px;">GRAND TOTAL:</span> <span
+                                id="view-grand-total" style="font-size: 15px;">0.00</span></div>
+                    </div>
+                </footer>
+
+                <section class="invoice-footer">
+                    <div class="terms-box">
+                        <strong>Terms and Conditions:</strong>
+                        <ol id="view-terms" style="margin-left: 15px; margin-top: 5px;">
+                            <li>Goods once sold will not be taken back.</li>
+                            <li>All Disputes are subject to Delhi Jurisdiction only.</li>
+                            <li>Interest @ 24% p/a will be charged if payment not made within 30 days.</li>
+                        </ol>
+                        <div style="margin-top: 20px; border-top: 1px dotted #000; width: 120px; font-size: 10px;">
+                            Customer Signature</div>
+                    </div>
+                    <div class="sign-box">
+                        <strong style="font-size: 11px;">FOR <span id="view-seller-name-footer"></span></strong>
+                        <div class="auth-sign-area">
+                            Authorised Signatory<br>
+                            <span style="font-size: 9px; font-weight: normal;">[E & O.E.]</span>
+                        </div>
+                    </div>
+                </section>
+            </article>
+        </main>
+    </div>
+    </div>
+    
+    <div id="view-analyzer" class="app-view">
+        <!-- Ambient Background Glows -->
+    
+    
+
+    <nav class="navbar">
+        <div class="logo">
+            <span class="logo-icon">⌘</span>
+            Accounting Studio
+        </div>
+        <div class="nav-links">
+            
+<button class="theme-toggle" onclick="window.toggleTheme()" title="Toggle Dark/Light Mode">
+    <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+    <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+</button>
+<a href="#dashboard" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="analyzer-container">
+        <div class="header-section">
+            <div>
+                <h1>Statement <span>Analyzer</span></h1>
+                <p class="subtitle" style="margin-bottom: 0;">Upload your CSV bank statement for instant categorization and insights.</p>
+            </div>
+        </div>
+
+        <!-- Upload Zone -->
+        <div id="upload-zone" class="upload-zone">
+            <input type="file" id="csv-file" accept=".csv" style="display: none;">
+            <svg class="upload-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <div class="upload-text">Drag & Drop your CSV file here</div>
+            <div class="upload-subtext">or click to browse from your computer</div>
+        </div>
+
+        <!-- Dashboard Area (Hidden until data is loaded) -->
+        <div id="dashboard-area" class="dashboard-area">
+            
+            <div class="stats-grid">
+                <div class="stat-card income">
+                    <div class="stat-value" id="total-income">₹0.00</div>
+                    <div class="stat-label">Total Income</div>
+                </div>
+                <div class="stat-card expense">
+                    <div class="stat-value" id="total-expense">₹0.00</div>
+                    <div class="stat-label">Total Expenses</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="net-balance">₹0.00</div>
+                    <div class="stat-label">Net Balance Change</div>
+                </div>
+            </div>
+
+            <div class="main-content-grid">
+                <!-- Chart Section -->
+                <div class="chart-container">
+                    <div class="section-title">Expense Breakdown</div>
+                    <div style="position: relative; height: 350px; width: 100%;">
+                        <canvas id="expenseChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Table Section -->
+                <div class="table-container">
+                    <div class="section-title">
+                        Transactions
+                        <div style="display: flex; gap: 8px; position: relative;" id="export-menu-container">
+                            <button class="btn btn-primary" onclick="document.getElementById('export-dropdown').classList.toggle('show')" style="padding: 6px 12px; font-size: 0.85rem; display: flex; align-items: center; gap: 4px;">
+                                Export <span style="font-size: 0.7rem;">▼</span>
+                            </button>
+                            <div class="profile-dropdown" id="export-dropdown" style="top: 110%; right: 0; padding: 8px; min-width: 150px; z-index: 1050;">
+                                <button class="btn btn-outline" style="width: 100%; border: none; justify-content: flex-start; margin-bottom: 4px; font-size: 0.85rem; padding: 6px 12px;" onclick="window.exportData('pdf')">Export to PDF</button>
+                                <button class="btn btn-outline" style="width: 100%; border: none; justify-content: flex-start; margin-bottom: 4px; font-size: 0.85rem; padding: 6px 12px;" onclick="window.exportData('excel')">Export to Excel</button>
+                                <button class="btn btn-outline" style="width: 100%; border: none; justify-content: flex-start; font-size: 0.85rem; padding: 6px 12px;" onclick="window.exportData('doc')">Export to Docs</button>
+                            </div>
+                            <button id="reset-data" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;">Upload New File</button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-controls">
+                        <input type="text" id="search-input" class="search-input" placeholder="Search descriptions or categories...">
+                        <select id="filter-type" class="filter-select">
+                            <option value="all">All Transactions</option>
+                            <option value="income">Income Only</option>
+                            <option value="expense">Expenses Only</option>
+                        </select>
+                    </div>
+
+                    <div class="data-table-wrapper">
+                        <table class="data-table" id="transactions-table">
+                            <thead>
+                                <tr>
+                                    <th data-sort="date">Date ↕</th>
+                                    <th data-sort="description">Description ↕</th>
+                                    <th data-sort="category">Category ↕</th>
+                                    <th data-sort="amount" style="text-align: right;">Amount ↕</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body">
+                                <!-- Data populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Analyzer Logic script -->
+    </div>
+
+    <!-- View: Ledgers -->
+    <div id="view-ledgers" class="app-view">
+        <nav class="navbar">
+            <div class="logo">
+                <span class="logo-icon">⌘</span> Accounting Studio | Ledgers
+            </div>
+            <div class="nav-links" style="align-items: center; display: flex; gap: 10px;">
+                <button class="theme-toggle" onclick="window.toggleTheme()" title="Toggle Dark/Light Mode">
+                    <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+                <a href="#dashboard" class="btn btn-secondary">Back to Dashboard</a>
+            </div>
+        </nav>
+        <div class="analyzer-container">
+            <div class="header-section">
+                <div>
+                    <h1>Ledger <span>Accounts</span></h1>
+                    <p class="subtitle">Manage Customers, Suppliers, Bank, and Cash accounts.</p>
+                </div>
+                <button class="btn btn-primary" onclick="window.showLedgerModal()">+ Add Ledger</button>
+            </div>
+            
+            <div class="table-container">
+                <div class="data-table-wrapper">
+                    <table class="data-table" id="ledgers-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Group</th>
+                                <th>GSTIN</th>
+                                <th>Opening Bal</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ledgers-table-body">
+                            <!-- Data populated by ledger.js -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Ledger Modal -->
+        <div id="ledger-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
+            <div style="background:var(--bg-card); padding:2rem; border-radius:16px; width:400px; max-width:90%; border:1px solid var(--border);">
+                <h3 id="ledger-modal-title" style="margin-bottom: 1rem;">Add Ledger</h3>
+                <form id="ledger-form" class="input-grid" style="display: flex; flex-direction: column; gap: 1rem;">
+                    <input type="hidden" id="ledger-id">
+                    <div class="input-group">
+                        <label>Account Name</label>
+                        <input type="text" id="ledger-name" required placeholder="e.g. ABC Corp">
+                    </div>
+                    <div class="input-group">
+                        <label>Group</label>
+                        <select id="ledger-group" class="filter-select" style="width: 100%;">
+                            <option value="Sundry Debtors">Sundry Debtors (Customers)</option>
+                            <option value="Sundry Creditors">Sundry Creditors (Suppliers)</option>
+                            <option value="Bank Accounts">Bank Accounts</option>
+                            <option value="Cash-in-hand">Cash-in-hand</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>GSTIN (Optional)</label>
+                        <input type="text" id="ledger-gstin" placeholder="29ABCDE1234F1Z5">
+                    </div>
+                    <div class="input-group">
+                        <label>Opening Balance</label>
+                        <input type="number" id="ledger-opbal" value="0" step="0.01">
+                    </div>
+                    <div style="display:flex; gap:10px; margin-top: 10px;">
+                        <button type="submit" class="btn btn-primary" style="flex:1;">Save</button>
+                        <button type="button" class="btn btn-secondary" style="flex:1;" onclick="window.closeLedgerModal()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- View: Inventory -->
+    <div id="view-inventory" class="app-view">
+        <nav class="navbar">
+            <div class="logo">
+                <span class="logo-icon">⌘</span> Accounting Studio | Inventory
+            </div>
+            <div class="nav-links" style="align-items: center; display: flex; gap: 10px;">
+                <button class="theme-toggle" onclick="window.toggleTheme()" title="Toggle Dark/Light Mode">
+                    <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+                <a href="#dashboard" class="btn btn-secondary">Back to Dashboard</a>
+            </div>
+        </nav>
+        <div class="analyzer-container">
+            <div class="header-section">
+                <div>
+                    <h1>Inventory <span>Items</span></h1>
+                    <p class="subtitle">Manage stock items, HSN, and pricing.</p>
+                </div>
+                <button class="btn btn-primary" onclick="window.showInventoryModal()">+ Add Item</button>
+            </div>
+            
+            <div class="table-container">
+                <div class="data-table-wrapper">
+                    <table class="data-table" id="inventory-table">
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>HSN</th>
+                                <th>Stock</th>
+                                <th>Unit</th>
+                                <th>Price</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-table-body">
+                            <!-- Data populated by inventory.js -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inventory Modal -->
+        <div id="inventory-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
+            <div style="background:var(--bg-card); padding:2rem; border-radius:16px; width:400px; max-width:90%; border:1px solid var(--border);">
+                <h3 id="inventory-modal-title" style="margin-bottom: 1rem;">Add Item</h3>
+                <form id="inventory-form" class="input-grid" style="display: flex; flex-direction: column; gap: 1rem;">
+                    <input type="hidden" id="inv-id">
+                    <div class="input-group">
+                        <label>Item Name</label>
+                        <input type="text" id="inv-name" required placeholder="e.g. Steel Pipe">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <div class="input-group" style="flex:1;">
+                            <label>HSN Code</label>
+                            <input type="text" id="inv-hsn" placeholder="7304">
+                        </div>
+                        <div class="input-group" style="width: 80px;">
+                            <label>Unit</label>
+                            <input type="text" id="inv-unit" value="PCS" placeholder="PCS">
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <div class="input-group" style="flex:1;">
+                            <label>Selling Price (₹)</label>
+                            <input type="number" id="inv-price" value="0" step="0.01">
+                        </div>
+                        <div class="input-group" style="flex:1;">
+                            <label>Opening Stock</label>
+                            <input type="number" id="inv-stock" value="0" step="0.01">
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:10px; margin-top: 10px;">
+                        <button type="submit" class="btn btn-primary" style="flex:1;">Save</button>
+                        <button type="button" class="btn btn-secondary" style="flex:1;" onclick="window.closeInventoryModal()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- View: Daybook -->
+    <div id="view-daybook" class="app-view">
+        <nav class="navbar">
+            <div class="logo">
+                <span class="logo-icon">⌘</span> Accounting Studio | Daybook
+            </div>
+            <div class="nav-links" style="align-items: center; display: flex; gap: 10px;">
+                <button class="theme-toggle" onclick="window.toggleTheme()" title="Toggle Dark/Light Mode">
+                    <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+                <a href="#dashboard" class="btn btn-secondary">Back to Dashboard</a>
+            </div>
+        </nav>
+        <div class="analyzer-container">
+            <div class="header-section">
+                <div>
+                    <h1>Daybook <span>(Journal)</span></h1>
+                    <p class="subtitle">Record daily transactions, expenses, and incomes.</p>
+                </div>
+                <button class="btn btn-primary" onclick="window.showDaybookModal()">+ Add Entry</button>
+            </div>
+            
+            <div class="table-container">
+                <div class="data-table-wrapper">
+                    <table class="data-table" id="daybook-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Ledger (Account)</th>
+                                <th>Description</th>
+                                <th>Amount (₹)</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="daybook-table-body">
+                            <!-- Data populated by daybook.js -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daybook Modal -->
+        <div id="daybook-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
+            <div style="background:var(--bg-card); padding:2rem; border-radius:16px; width:450px; max-width:90%; border:1px solid var(--border);">
+                <h3 id="daybook-modal-title" style="margin-bottom: 1rem;">Add Journal Entry</h3>
+                <form id="daybook-form" class="input-grid" style="display: flex; flex-direction: column; gap: 1rem;">
+                    <input type="hidden" id="entry-id">
+                    <div style="display: flex; gap: 10px;">
+                        <div class="input-group" style="flex:1;">
+                            <label>Date</label>
+                            <input type="date" id="entry-date" required>
+                        </div>
+                        <div class="input-group" style="flex:1;">
+                            <label>Type</label>
+                            <select id="entry-type" required style="width: 100%; padding: 10px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text-main); border-radius: 8px;">
+                                <option value="Payment">Payment (Expense)</option>
+                                <option value="Receipt">Receipt (Income)</option>
+                                <option value="Contra">Contra (Bank/Cash)</option>
+                                <option value="Journal">Journal</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Ledger / Account</label>
+                        <select id="entry-ledger" required style="width: 100%; padding: 10px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text-main); border-radius: 8px;">
+                            <option value="">Select Ledger</option>
+                            <option value="Cash">Cash Account</option>
+                            <option value="Bank">Bank Account</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Amount (₹)</label>
+                        <input type="number" id="entry-amount" value="0" step="0.01" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Description / Narration</label>
+                        <textarea id="entry-desc" rows="2" placeholder="Narration for this entry"></textarea>
+                    </div>
+                    <div style="display:flex; gap:10px; margin-top: 10px;">
+                        <button type="submit" class="btn btn-primary" style="flex:1;">Save Entry</button>
+                        <button type="button" class="btn btn-secondary" style="flex:1;" onclick="window.closeDaybookModal()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Widget -->
+    <div class="feedback-widget">
+        <div class="feedback-panel" id="feedback-panel">
+            <div class="feedback-header">
+                <h3 style="margin: 0; font-size: 1.1rem;">Send Feedback</h3>
+                <button class="feedback-close" id="feedback-close" style="background:none; border:none; color:var(--text-main); font-size:1.5rem; cursor:pointer;">&times;</button>
+            </div>
+            <form id="feedback-form" class="feedback-body input-grid" style="padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+                <div class="input-group">
+                    <label>Name</label>
+                    <input type="text" id="feedback-name" required placeholder="Your Name">
+                </div>
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" id="feedback-email" required placeholder="you@example.com">
+                </div>
+                <div class="input-group">
+                    <label>Summary</label>
+                    <textarea id="feedback-summary" rows="3" required placeholder="What's on your mind?"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 8px;">Submit</button>
+            </form>
+            <div id="feedback-success" style="display:none; padding:20px; text-align:center; color:#10b981; font-weight: 500;">
+                Thank you for your feedback!
+            </div>
+        </div>
+        <button class="feedback-trigger btn btn-primary" id="feedback-trigger">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+            Feedback
+        </button>
+    </div>
+
+    <!-- Application Scripts -->
+    <script type="module" src="js/router.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/ledger.js"></script>
+    <script type="module" src="js/inventory.js"></script>
+    <script type="module" src="js/script.js"></script>
+    <script type="module" src="js/analyzer.js"></script>
+    <script type="module" src="js/daybook.js"></script>
+</body>
+</html>
