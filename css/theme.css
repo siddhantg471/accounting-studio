@@ -1,0 +1,127 @@
+/* theme.css */
+:root {
+    /* Base Transition */
+    --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-spring: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+    
+    /* Core brand colors */
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --accent: #ec4899;
+    --accent-hover: #db2777;
+    
+    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+[data-theme="dark"] {
+    --bg-main: #0B0F19;
+    --bg-gradient: radial-gradient(circle at top left, #1f2937 0%, #0B0F19 100%);
+    --bg-card: rgba(17, 24, 39, 0.65);
+    --bg-editor: #0B0F19;
+    --bg-preview: #111827;
+    
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    
+    --border: rgba(255, 255, 255, 0.08);
+    --border-color: rgba(255, 255, 255, 0.08);
+    --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+    
+    --glow: rgba(79, 70, 229, 0.5);
+    --input-bg: rgba(17, 24, 39, 0.6);
+    --card-bg: rgba(17, 24, 39, 0.7);
+    --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    --shadow-hover: 0 20px 40px -10px rgba(0, 0, 0, 0.7);
+    
+    --table-header: rgba(30, 41, 59, 0.95);
+    --table-hover: rgba(255, 255, 255, 0.02);
+    --input-default: #0f172a;
+    --input-focus: #1e293b;
+    
+    --danger-bg: rgba(239, 68, 68, 0.2);
+    --danger-text: #fca5a5;
+    --danger-hover: rgba(239, 68, 68, 0.3);
+    
+    --danger: #ef4444;
+    --success: #4ade80;
+    
+    --outline-hover: rgba(255, 255, 255, 0.1);
+    
+    --scrollbar-thumb: #475569;
+    --scrollbar-hover: #64748b;
+    
+    /* Legacy aliases */
+    --bg-dark: var(--bg-main);
+    --bg-editor: var(--bg-main);
+
+}
+
+[data-theme="light"] {
+    --bg-main: #F3F4F6;
+    --bg-gradient: radial-gradient(circle at top left, #F9FAFB 0%, #F3F4F6 100%);
+    --bg-card: #ffffff;
+    --bg-editor: #F9FAFB;
+    --bg-preview: #E5E7EB;
+    
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    
+    --border: rgba(0, 0, 0, 0.12);
+    --border-color: rgba(0, 0, 0, 0.12);
+    --glass-border: 1px solid rgba(0, 0, 0, 0.1);
+    
+    --glow: rgba(79, 70, 229, 0.15);
+    --input-bg: #ffffff;
+    --card-bg: #ffffff;
+    --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
+    --shadow-hover: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
+    
+    --table-header: #f1f5f9;
+    --table-hover: rgba(0, 0, 0, 0.02);
+    --input-default: #fdfdfd;
+    --input-focus: #ffffff;
+    
+    --danger-bg: #fee2e2;
+    --danger-text: #ef4444;
+    --danger-hover: #fecaca;
+    
+    --danger: #dc2626;
+    --success: #16a34a;
+    
+    --outline-hover: #f1f5f9;
+    
+    --scrollbar-thumb: #cbd5e1;
+    --scrollbar-hover: #94a3b8;
+    
+    /* Legacy aliases */
+    --bg-dark: var(--bg-main);
+    --bg-editor: var(--bg-main);
+
+}
+
+body {
+    background: var(--bg-gradient);
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.theme-toggle {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: var(--transition);
+    margin-right: 12px;
+}
+.theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+[data-theme="dark"] .moon-icon { display: none; }
+[data-theme="light"] .sun-icon { display: none; }
