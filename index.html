@@ -22,6 +22,9 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 </head>
 <body>
     <!-- Global Ambient Background Glows -->
@@ -560,14 +563,14 @@ Interest @ 24% p/a will be charged if payment not made within 30 days.</textarea
 
         <!-- Upload Zone -->
         <div id="upload-zone" class="upload-zone">
-            <input type="file" id="csv-file" accept=".csv" style="display: none;">
+            <input type="file" id="csv-file" accept=".csv,.xlsx,.xls,.pdf,.docx" style="display: none;">
             <svg class="upload-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                 <polyline points="17 8 12 3 7 8"></polyline>
                 <line x1="12" y1="3" x2="12" y2="15"></line>
             </svg>
-            <div class="upload-text">Drag & Drop your CSV file here</div>
-            <div class="upload-subtext">or click to browse from your computer</div>
+            <div class="upload-text">Drag & Drop your Statement here</div>
+            <div class="upload-subtext">Supports CSV, Excel, PDF, and Word Documents</div>
         </div>
 
         <!-- Dashboard Area (Hidden until data is loaded) -->
@@ -591,7 +594,7 @@ Interest @ 24% p/a will be charged if payment not made within 30 days.</textarea
             <div class="main-content-grid">
                 <!-- Chart Section -->
                 <div class="chart-container">
-                    <div class="section-title">Expense Breakdown</div>
+                    <div class="section-title">Financial Overview</div>
                     <div style="position: relative; height: 350px; width: 100%;">
                         <canvas id="expenseChart"></canvas>
                     </div>
@@ -608,7 +611,8 @@ Interest @ 24% p/a will be charged if payment not made within 30 days.</textarea
                             <div class="profile-dropdown" id="export-dropdown" style="top: 110%; right: 0; padding: 8px; min-width: 150px; z-index: 1050;">
                                 <button class="btn btn-outline" style="width: 100%; border: none; justify-content: flex-start; margin-bottom: 4px; font-size: 0.85rem; padding: 6px 12px;" onclick="window.exportData('pdf')">Export to PDF</button>
                                 <button class="btn btn-outline" style="width: 100%; border: none; justify-content: flex-start; margin-bottom: 4px; font-size: 0.85rem; padding: 6px 12px;" onclick="window.exportData('excel')">Export to Excel</button>
-                                <button class="btn btn-outline" style="width: 100%; border: none; justify-content: flex-start; font-size: 0.85rem; padding: 6px 12px;" onclick="window.exportData('doc')">Export to Docs</button>
+                                <button class="btn btn-outline" style="width: 100%; border: none; justify-content: flex-start; margin-bottom: 4px; font-size: 0.85rem; padding: 6px 12px;" onclick="window.exportData('doc')">Export to Docs</button>
+                                <button class="btn btn-outline" style="width: 100%; border: none; justify-content: flex-start; font-size: 0.85rem; padding: 6px 12px;" onclick="window.exportData('csv')">Export to CSV</button>
                             </div>
                             <button id="reset-data" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;">Upload New File</button>
                         </div>
