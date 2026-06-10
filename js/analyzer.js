@@ -93,27 +93,114 @@ resetBtn.addEventListener('click', () => {
     fileInput.value = '';
 });
 
-function handleFile(file) {
-    if (!file.name.endsWith('.csv')) {
-        alert('Please upload a valid CSV file.');
-        return;
-    }
+function showDashboard() {
+    uploadZone.style.display = 'none';
+    dashboardArea.style.display = 'block';
+}
 
-    Papa.parse(file, {
-        header: true,
-        skipEmptyLines: true,
-        complete: function(results) {
-            console.log("Parsed CSV:", results.data);
-            processData(results.data);
-            
-            uploadZone.style.display = 'none';
-            dashboardArea.style.display = 'block';
-        },
-        error: function(err) {
-            console.error("Parse Error:", err);
-            alert('Error parsing CSV file.');
+function handleFile(file) {
+    const ext = file.name.split('.').pop().toLowerCase();
+
+    if (ext === 'csv') {
+        Papa.parse(file, {
+            header: true,
+            skipEmptyLines: true,
+            complete: function(results) {
+                console.log("Parsed CSV:", results.data);
+                processData(results.data);
+                showDashboard();
+            },
+            error: function(err) {
+                console.error("Parse Error:", err);
+                alert('Error parsing CSV file.');
+            }
+        });
+    } else if (ext === 'xlsx' || ext === 'xls') {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const firstSheet = workbook.SheetNames[0];
+                const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
+                console.log("Parsed Excel:", sheetData);
+                processData(sheetData);
+                showDashboard();
+            } catch (err) {
+                console.error("Excel Parse Error:", err);
+                alert("Error parsing Excel file.");
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    } else if (ext === 'pdf') {
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            try {
+                const typedarray = new Uint8Array(e.target.result);
+                const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                let fullText = "";
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    const pageText = textContent.items.map(item => item.str).join(' ');
+                    fullText += pageText + "\n";
+                }
+                parseTextToData(fullText);
+            } catch (err) {
+                console.error("PDF Parse Error:", err);
+                alert("Error parsing PDF file.");
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    } else if (ext === 'docx') {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            mammoth.extractRawText({arrayBuffer: e.target.result})
+                .then(function(result) {
+                    parseTextToData(result.value);
+                })
+                .catch(function(err) {
+                    console.error("DOCX Parse Error:", err);
+                    alert("Error parsing Word document.");
+                });
+        };
+        reader.readAsArrayBuffer(file);
+    } else {
+        alert('Unsupported file type. Please upload CSV, Excel, PDF, or Word document.');
+    }
+}
+
+function parseTextToData(text) {
+    const lines = text.split('\n');
+    let parsedData = [];
+    
+    // Very basic heuristic for text-based tables:
+    // e.g., "12/05/2023 Amazon Purchase 500.00 Cr"
+    const regex = /(\d{1,2}[-/]\d{1,2}[-/]\d{2,4})\s+(.+?)\s+([\d,]+\.\d{2})\s*(Cr|Dr|Cr\.|Dr\.)?/i;
+    
+    lines.forEach(line => {
+        const match = line.match(regex);
+        if (match) {
+            let row = {
+                'Date': match[1],
+                'Description': match[2].trim(),
+                'Amount': match[3]
+            };
+            if (match[4]) {
+                row['Amount'] += ' ' + match[4]; // append Cr/Dr to let processData handle it
+            }
+            parsedData.push(row);
         }
     });
+
+    if (parsedData.length === 0) {
+        alert("Could not reliably extract tabular data from this document. Please ensure it contains standard transaction formats, or try exporting it to CSV/Excel first.");
+        return;
+    }
+    
+    console.log("Parsed Text Data:", parsedData);
+    processData(parsedData);
+    showDashboard();
 }
 
 // --- DATA PROCESSING ---
@@ -134,7 +221,7 @@ function processData(data) {
     
     const debitCol = origHeaders.find(h => ['debit', 'withdrawal', 'paid out'].some(kw => h.trim().toLowerCase().includes(kw)));
     const creditCol = origHeaders.find(h => ['credit', 'deposit', 'paid in'].some(kw => h.trim().toLowerCase().includes(kw)));
-    const amountCol = origHeaders.find(h => h.trim().toLowerCase() === 'amount');
+    const amountCol = origHeaders.find(h => h.trim().toLowerCase().includes('amount'));
 
     const parseNumberAndSign = (val) => {
         if (val === undefined || val === null) return { num: 0, hasCr: false, hasDr: false, isNeg: false };
@@ -157,8 +244,11 @@ function processData(data) {
     };
 
     data.forEach(row => {
-        let date = row[dateCol];
-        let description = row[descCol] || '';
+        let date = String(row[dateCol] || '').trim();
+        // Skip empty rows or summary rows that don't have a valid date
+        if (!date) return;
+        
+        let description = String(row[descCol] || '').trim();
         let amount = 0;
         let isIncome = false;
 
@@ -166,8 +256,8 @@ function processData(data) {
         let rowHasDr = false;
         for (let key in row) {
             let v = String(row[key] || '').trim().toLowerCase();
-            if (['cr', 'cr.', 'credit', 'c'].includes(v)) rowHasCr = true;
-            if (['dr', 'dr.', 'debit', 'd'].includes(v)) rowHasDr = true;
+            if (['cr', 'cr.', 'credit', 'c', 'income'].includes(v)) rowHasCr = true;
+            if (['dr', 'dr.', 'debit', 'd', 'expense'].includes(v)) rowHasDr = true;
         }
 
         let debitData = debitCol ? parseNumberAndSign(row[debitCol]) : {num: 0};
@@ -263,109 +353,83 @@ function updateDashboard() {
     netBalanceEl.textContent = `₹${Math.abs(net).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
     netBalanceEl.style.color = net >= 0 ? 'var(--success, #22c55e)' : 'var(--danger, #ef4444)';
 
-    renderChart(categoryTotals);
+    renderChart({ income, expense, net });
 }
 
-function renderChart(categoryTotals) {
+function renderChart(financials) {
     const ctx = document.getElementById('expenseChart').getContext('2d');
     
     if (chartInstance) {
         chartInstance.destroy();
     }
 
-    const labels = Object.keys(categoryTotals).sort((a,b) => categoryTotals[b] - categoryTotals[a]);
-    const data = labels.map(l => categoryTotals[l]);
-
-    // Handle empty state
-    if (labels.length === 0) {
-        const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
-        const emptyColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
-        
-        chartInstance = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['No Expenses'],
-                datasets: [{
-                    data: [1],
-                    backgroundColor: [emptyColor],
-                    borderWidth: 0,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '75%',
-                plugins: {
-                    legend: { display: false },
-                    tooltip: { enabled: false }
-                }
-            }
-        });
-        return;
-    }
+    const { income, expense, net } = financials;
 
     const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
     const textColor = isDark ? '#f8fafc' : '#0f172a';
     const borderColor = isDark ? '#1e293b' : '#ffffff';
 
-    const colors = [
-        '#3b82f6', '#8b5cf6', '#ec4899', '#f43f5e', 
-        '#f59e0b', '#10b981', '#0ea5e9', '#6366f1',
-        '#14b8a6', '#f97316'
-    ];
-
     chartInstance = new Chart(ctx, {
-        type: 'doughnut',
+        type: 'bar',
         data: {
-            labels: labels,
+            labels: ['Total Income', 'Total Expenses', 'Net Balance'],
             datasets: [{
-                data: data,
-                backgroundColor: colors.slice(0, labels.length),
-                borderWidth: 2,
+                label: 'Amount (₹)',
+                data: [income, expense, net],
+                backgroundColor: [
+                    '#22c55e', // Green for income
+                    '#ef4444', // Red for expense
+                    net >= 0 ? '#3b82f6' : '#f97316' // Blue for positive net, orange for negative
+                ],
+                borderWidth: 1,
                 borderColor: borderColor,
-                hoverOffset: 8,
-                borderRadius: 4
+                borderRadius: 6
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutout: '70%',
             plugins: {
-                legend: {
-                    position: 'right',
-                    labels: { 
-                        color: textColor, 
-                        font: { family: 'Outfit', size: 13 },
-                        padding: 20,
-                        usePointStyle: true,
-                        pointStyle: 'circle'
-                    }
-                },
+                legend: { display: false },
                 tooltip: {
                     backgroundColor: 'rgba(15, 23, 42, 0.9)',
                     titleFont: { family: 'Outfit', size: 14, weight: '600' },
                     bodyFont: { family: 'Outfit', size: 14 },
                     padding: 12,
                     cornerRadius: 8,
-                    displayColors: true,
                     callbacks: {
                         label: function(context) {
-                            let label = context.label || '';
-                            if (label) {
-                                label += ': ';
-                            }
-                            if (context.parsed !== null) {
-                                label += new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(context.parsed);
+                            let label = context.dataset.label || '';
+                            if (label) label += ': ';
+                            if (context.parsed.y !== null) {
+                                label += new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(context.parsed.y);
                             }
                             return label;
                         }
                     }
                 }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: textColor,
+                        font: { family: 'Outfit' }
+                    },
+                    grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }
+                },
+                x: {
+                    ticks: {
+                        color: textColor,
+                        font: { family: 'Outfit', weight: '600' }
+                    },
+                    grid: { display: false }
+                }
             }
         }
     });
 }
+
 
 function renderTable() {
     const searchTerm = searchInput.value.toLowerCase();
@@ -598,6 +662,23 @@ window.exportData = function(type) {
         document.body.appendChild(fileDownload);
         fileDownload.href = url;
         fileDownload.download = 'Statement_Analysis.doc';
+        fileDownload.click();
+        document.body.removeChild(fileDownload);
+    } else if (type === 'csv') {
+        const csvContent = exportRows.map(e => e.map(cell => {
+            let str = String(cell);
+            // escape quotes and wrap in quotes if contains comma
+            if (str.includes(',') || str.includes('"')) {
+                str = `"${str.replace(/"/g, '""')}"`;
+            }
+            return str;
+        }).join(",")).join("\n");
+        const blob = new Blob([exportHeaders.join(",") + "\n" + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const fileDownload = document.createElement("a");
+        fileDownload.setAttribute("href", url);
+        fileDownload.setAttribute("download", "Statement_Analysis.csv");
+        document.body.appendChild(fileDownload);
         fileDownload.click();
         document.body.removeChild(fileDownload);
     }
