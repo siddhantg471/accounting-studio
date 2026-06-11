@@ -322,7 +322,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 div.style.padding = '8px 12px';
                 div.style.cursor = 'pointer';
                 div.style.borderBottom = '1px solid var(--border)';
-                div.innerHTML = `<strong>${match.name}</strong> <span style="float:right; font-size:0.8rem; color:var(--text-muted)">Stock: ${match.stock}</span>`;
+                const godownText = match.godown ? ` <span style="font-size:0.7rem; background:#eee; padding:2px 4px; border-radius:4px; margin-left:4px;">${match.godown}</span>` : '';
+                div.innerHTML = `<strong>${match.name}</strong>${godownText} <span style="float:right; font-size:0.8rem; color:var(--text-muted)">Stock: ${match.stock}</span>`;
                 div.onmousedown = (e) => { // mousedown fires before blur
                     e.preventDefault(); 
                     window.selectInventoryItem(id, match);
