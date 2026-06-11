@@ -1,8 +1,8 @@
 import { auth } from '../../backend/firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-const views = ['login', 'dashboard', 'invoice', 'analyzer', 'ledgers', 'inventory', 'daybook'];
-const protectedRoutes = ['dashboard', 'invoice', 'analyzer', 'ledgers', 'inventory', 'daybook'];
+const views = ['login', 'dashboard', 'invoice', 'analyzer', 'ledgers', 'inventory', 'daybook', 'reports'];
+const protectedRoutes = ['dashboard', 'invoice', 'analyzer', 'ledgers', 'inventory', 'daybook', 'reports'];
 let currentUser = null;
 
 function showView(viewId) {
