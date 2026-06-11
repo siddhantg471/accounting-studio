@@ -41,8 +41,9 @@ function loadDaybook() {
                 <td style="font-weight:500;">${data.ledger}</td>
                 <td>${data.description || '-'}</td>
                 <td class="amount ${amtClass}">₹${parseFloat(data.amount).toFixed(2)}</td>
+                <td><span class="badge-category">${data.costCentre || '-'}</span></td>
                 <td>
-                    <button class="btn btn-outline" style="padding:4px 8px; font-size:0.7rem;" onclick="window.editDaybook('${data.id}', '${data.date}', '${data.type}', '${data.ledger}', '${data.amount}', '${data.description}')">Edit</button>
+                    <button class="btn btn-outline" style="padding:4px 8px; font-size:0.7rem;" onclick="window.editDaybook('${data.id}', '${data.date}', '${data.type}', '${data.ledger}', '${data.amount}', '${data.description}', '${data.costCentre || ''}')">Edit</button>
                     <button class="btn btn-outline" style="padding:4px 8px; font-size:0.7rem; color:#ef4444; border-color:#ef4444;" onclick="window.deleteDaybook('${data.id}')">Delete</button>
                 </td>
             `;
@@ -78,6 +79,8 @@ window.showDaybookModal = () => {
     document.getElementById('entry-ledger').value = '';
     document.getElementById('entry-amount').value = '0';
     document.getElementById('entry-desc').value = '';
+    const ccEl = document.getElementById('entry-cc');
+    if (ccEl) ccEl.value = '';
     document.getElementById('daybook-modal-title').textContent = 'Add Journal Entry';
     document.getElementById('daybook-modal').style.display = 'flex';
 };
@@ -86,13 +89,15 @@ window.closeDaybookModal = () => {
     document.getElementById('daybook-modal').style.display = 'none';
 };
 
-window.editDaybook = (id, date, type, ledger, amount, desc) => {
+window.editDaybook = (id, date, type, ledger, amount, desc, costCentre) => {
     document.getElementById('entry-id').value = id;
     document.getElementById('entry-date').value = date;
     document.getElementById('entry-type').value = type;
     document.getElementById('entry-ledger').value = ledger;
     document.getElementById('entry-amount').value = amount;
     document.getElementById('entry-desc').value = desc === 'undefined' ? '' : desc;
+    const ccEl = document.getElementById('entry-cc');
+    if (ccEl) ccEl.value = costCentre === 'undefined' ? '' : costCentre;
     document.getElementById('daybook-modal-title').textContent = 'Edit Journal Entry';
     document.getElementById('daybook-modal').style.display = 'flex';
 };
@@ -118,9 +123,11 @@ document.getElementById('daybook-form')?.addEventListener('submit', async (e) =>
     const ledger = document.getElementById('entry-ledger').value;
     const amount = parseFloat(document.getElementById('entry-amount').value) || 0;
     const description = document.getElementById('entry-desc').value;
+    const ccEl = document.getElementById('entry-cc');
+    const costCentre = ccEl ? ccEl.value : '';
 
     const entryData = {
-        date, type, ledger, amount, description,
+        date, type, ledger, amount, description, costCentre,
         userId: currentUserId,
         updatedAt: new Date()
     };
