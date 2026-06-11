@@ -33,10 +33,11 @@ function loadInventory() {
                 <td>${data.name}</td>
                 <td>${data.hsn || '-'}</td>
                 <td style="font-weight:600;">${data.stock}</td>
-                <td>${data.unit}</td>
-                <td class="amount positive">₹${data.price.toFixed(2)}</td>
+                <td>${data.unit || 'PCS'}</td>
+                <td style="font-weight:600; color:#10b981;">₹${parseFloat(data.price || 0).toFixed(2)}</td>
+                <td><span class="badge" style="background:var(--table-hover); color:var(--text-main); border:1px solid var(--border);">${data.godown || 'Main Location'}</span></td>
                 <td>
-                    <button class="btn btn-outline" style="padding:4px 8px; font-size:0.7rem;" onclick="window.editInventory('${doc.id}', '${data.name}', '${data.hsn || ''}', '${data.unit}', ${data.price}, ${data.stock})">Edit</button>
+                    <button class="btn btn-outline" style="padding:4px 8px; font-size:0.7rem;" onclick="window.editInventory('${doc.id}', '${data.name}', '${data.hsn}', '${data.unit}', '${data.price}', '${data.stock}', '${data.godown || 'Main Location'}')">Edit</button>
                     <button class="btn btn-outline" style="padding:4px 8px; font-size:0.7rem; color:#ef4444; border-color:#ef4444;" onclick="window.deleteInventory('${doc.id}')">Delete</button>
                 </td>
             `;
@@ -53,6 +54,8 @@ window.showInventoryModal = () => {
     document.getElementById('inv-unit').value = 'PCS';
     document.getElementById('inv-price').value = '0';
     document.getElementById('inv-stock').value = '0';
+    const godownEl = document.getElementById('inv-godown');
+    if(godownEl) godownEl.value = 'Main Location';
     document.getElementById('inventory-modal-title').textContent = 'Add Item';
     document.getElementById('inventory-modal').style.display = 'flex';
 };
@@ -61,13 +64,15 @@ window.closeInventoryModal = () => {
     document.getElementById('inventory-modal').style.display = 'none';
 };
 
-window.editInventory = (id, name, hsn, unit, price, stock) => {
+window.editInventory = (id, name, hsn, unit, price, stock, godown) => {
     document.getElementById('inv-id').value = id;
     document.getElementById('inv-name').value = name;
-    document.getElementById('inv-hsn').value = hsn;
-    document.getElementById('inv-unit').value = unit;
+    document.getElementById('inv-hsn').value = hsn === 'undefined' ? '' : hsn;
+    document.getElementById('inv-unit').value = unit === 'undefined' ? 'PCS' : unit;
     document.getElementById('inv-price').value = price;
     document.getElementById('inv-stock').value = stock;
+    const godownEl = document.getElementById('inv-godown');
+    if(godownEl) godownEl.value = godown === 'undefined' ? 'Main Location' : godown;
     document.getElementById('inventory-modal-title').textContent = 'Edit Item';
     document.getElementById('inventory-modal').style.display = 'flex';
 };
@@ -90,12 +95,14 @@ document.getElementById('inventory-form')?.addEventListener('submit', async (e) 
     const id = document.getElementById('inv-id').value;
     const name = document.getElementById('inv-name').value;
     const hsn = document.getElementById('inv-hsn').value;
-    const unit = document.getElementById('inv-unit').value;
+    const unit = document.getElementById('inv-unit').value || 'PCS';
     const price = parseFloat(document.getElementById('inv-price').value) || 0;
     const stock = parseFloat(document.getElementById('inv-stock').value) || 0;
+    const godownEl = document.getElementById('inv-godown');
+    const godown = godownEl ? godownEl.value : 'Main Location';
 
-    const invData = {
-        name, hsn, unit, price, stock,
+    const itemData = {
+        name, hsn, unit, price, stock, godown,
         userId: currentUserId,
         updatedAt: new Date()
     };
@@ -103,11 +110,11 @@ document.getElementById('inventory-form')?.addEventListener('submit', async (e) 
     try {
         if (id) {
             // Update
-            await updateDoc(doc(db, "inventory", id), invData);
+            await updateDoc(doc(db, "inventory", id), itemData);
         } else {
             // Add
-            invData.createdAt = new Date();
-            await addDoc(collection(db, "inventory"), invData);
+            itemData.createdAt = new Date();
+            await addDoc(collection(db, "inventory"), itemData);
         }
         window.closeInventoryModal();
     } catch (e) {
