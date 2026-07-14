@@ -6,13 +6,13 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebas
 // TODO: Replace the following with your app's Firebase project configuration
 // To get these keys: Go to Firebase Console -> Project Settings -> General -> Web App
 const firebaseConfig = {
-  apiKey: "AIzaSyDPPj8h5gUX26u1i0if5kJRrz9SviKlAgE",
-  authDomain: "harshit-engineering-work-efd27.firebaseapp.com",
-  projectId: "harshit-engineering-work-efd27",
-  storageBucket: "harshit-engineering-work-efd27.firebasestorage.app",
-  messagingSenderId: "1250561178",
-  appId: "1:1250561178:web:e4afa1c0321ac030432323",
-  measurementId: "G-B1SEWFNG23"
+  apiKey: "AIzaSyAX3wa2ylpJfO-2Nvl2IvbYwwkvn3yblvQ",
+  authDomain: "accounting-studio-6a411.firebaseapp.com",
+  projectId: "accounting-studio-6a411",
+  storageBucket: "accounting-studio-6a411.firebasestorage.app",
+  messagingSenderId: "351007360878",
+  appId: "1:351007360878:web:5a4eafa273e7bb5954a37f",
+  measurementId: "G-J71Y61XCQE"
 };
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
