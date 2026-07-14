@@ -5,6 +5,7 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebas
 
 // TODO: Replace the following with your app's Firebase project configuration
 // To get these keys: Go to Firebase Console -> Project Settings -> General -> Web App
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyAX3wa2ylpJfO-2Nvl2IvbYwwkvn3yblvQ",
   authDomain: "accounting-studio-6a411.firebaseapp.com",
