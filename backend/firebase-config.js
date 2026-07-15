@@ -7,14 +7,14 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebas
 // To get these keys: Go to Firebase Console -> Project Settings -> General -> Web App
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyAX3wa2ylpJfO-2Nvl2IvbYwwkvn3yblvQ",
-  authDomain: "accounting-studio-6a411.firebaseapp.com",
-  projectId: "accounting-studio-6a411",
-  storageBucket: "accounting-studio-6a411.firebasestorage.app",
-  messagingSenderId: "351007360878",
-  appId: "1:351007360878:web:5a4eafa273e7bb5954a37f",
-  measurementId: "G-J71Y61XCQE"
-};
+    apiKey: "AIzaSyAX3wa2ylpJfO-2Nvl2IvbYwwkvn3yblvQ",
+    authDomain: "accounting-studio-6a411.firebaseapp.com",
+    projectId: "accounting-studio-6a411",
+    storageBucket: "accounting-studio-6a411.firebasestorage.app",
+    messagingSenderId: "351007360878",
+    appId: "1:351007360878:web:c3fc0fa19a7f454b54a37f",
+    measurementId: "G-QZ4Q2ECY9Q"
+  };
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
